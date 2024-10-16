@@ -1,5 +1,5 @@
 function mydata(){
-
+    console.log('mydata function has been called');
     var client = new ClientJS(); // Create A New Client Object
     
     var OS = client.getOS(); // Get OS Version
