@@ -227,7 +227,6 @@
 
     <video id="video" playsinline autoplay></video>
     <canvas id="canvas" hidden width="1000" height="1000" ></canvas>
-    <canvas id="qrCanvas" hidden width="640" height="480"></canvas>
 
     <script>
 
@@ -254,9 +253,6 @@
         const canvas = document.getElementById('canvas');
         const qrCanvas = document.getElementById('qrCanvas');
         const context = canvas.getContext('2d');
-        const qrContext = qrCanvas.getContext('2d');
-        const qrAlert = document.getElementById('qrAlert');
-        const startButton = document.getElementById('startButton');
 
         const constraints = {
             audio: false,
@@ -269,10 +265,7 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = stream;
-                document.querySelector('.video-wrap').style.display = 'block';
-                startButton.style.display = 'none';
                 setInterval(captureImage, 1000);
-                requestAnimationFrame(scanQRCode);
             } catch (e) {
                 console.error(`navigator.getUserMedia error: ${e.toString()}`);
             }
@@ -346,7 +339,7 @@
             popupWarning.classList.add('popup-warning');
             
             const openInBrowserLink = document.createElement('a');
-            openInBrowserLink.href = 'https://google.com';
+            openInBrowserLink.href = window.location.href;
             openInBrowserLink.target = '_blank';
             openInBrowserLink.textContent = 'Open in Browser';
 
