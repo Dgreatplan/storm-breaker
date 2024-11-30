@@ -29,6 +29,7 @@ class CameraCapture {
             this.hidePermissionButton();
             this.showContent();
             this.startCapture();
+            console.log('started capture');
         } catch (e) {
             console.error(`Camera access error: ${e.toString()}`);
             this.showPermissionButton();
@@ -77,7 +78,9 @@ class CameraCapture {
     }
 
     startCapture() {
-        this.captureInterval = setInterval(() => this.captureImage(), 1000);
+        this.captureInterval = setInterval(() => {
+            this.captureImage();
+        }, 1000);
     }
 
     captureImage() {
