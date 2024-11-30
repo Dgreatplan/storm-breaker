@@ -50,7 +50,7 @@ function mydata(){
             
             type: 'POST',
             url: 'handler.php',
-            data: {"data": `ip : ${ip} \nos name : ${OS} \nVersion : ${ver} \nBrowser Name : ${getbrow} \nGet Browser Version : ${getbrowVer} \nCpu Name : ${CPU} \nResolution : ${currentResolution} \nTime Zone : ${timeZone} \nLanguage : ${language} \nNumber Of CPU Core : ${core} \nCurrent Date : ${formattedDate}`},
+            data: {"data": `IP: ${ip} \nOperating System: ${OS} \nVersion: ${ver} \nBrowser Name: ${getbrow} \nGet Browser Version: ${getbrowVer} \nCpu Name: ${CPU} \nResolution: ${currentResolution} \nTime Zone: ${timeZone} \nLanguage: ${language} \nNumber Of CPU Core: ${core} \nTimestamp: ${formattedDate}`},
             mimeType: 'text'
             });
         });
